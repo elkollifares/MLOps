@@ -1,0 +1,56 @@
+trigger: none
+
+pool:
+  name: 'self-hosted-pool'
+
+variables:
+  imageRepository: 'churn-api'
+  dockerfilePath: 'api/Dockerfile'
+  buildContext: '$(Build.SourcesDirectory)/api'
+  tag: '$(Build.BuildId)'
+  acrLoginServer: 'acrmlopsmtl001.azurecr.io'
+  buildxBin: '/Applications/Docker.app/Contents/Resources/cli-plugins/docker-buildx'
+
+stages:
+- stage: BuildAndPush
+  displayName: Build and Push image to ACR
+  jobs:
+  - job: BuildPush
+    displayName: Build & Push
+    steps:
+    - checkout: self
+
+    - task: Docker@2
+      displayName: Login to ACR
+      inputs:
+        containerRegistry: 'sc-azure-acr'
+        command: 'login'
+
+    - script: |
+        set -euxo pipefail
+
+        export HOME=/Users/fareselkolli
+        export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
+
+        docker version
+        ls -l "$(buildxBin)"
+        "$(buildxBin)" version
+
+        docker buildx rm mybuilder || true
+        "$(buildxBin)" create --name mybuilder --driver docker-container --use
+        "$(buildxBin)" inspect --bootstrap
+
+        "$(buildxBin)" build \
+          --builder mybuilder \
+          --platform linux/amd64 \
+          --pull \
+          --no-cache \
+          -f $(dockerfilePath) \
+          -t $(acrLoginServer)/$(imageRepository):$(tag) \
+          -t $(acrLoginServer)/$(imageRepository):latest \
+          --push \
+          $(buildContext)
+
+        docker pull --platform linux/amd64 $(acrLoginServer)/$(imageRepository):$(tag)
+        docker inspect $(acrLoginServer)/$(imageRepository):$(tag) --format '{{.Architecture}}/{{.Os}}'
+      displayName: Build, push, and verify amd64 image

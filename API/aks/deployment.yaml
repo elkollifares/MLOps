@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: churn-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: churn-api
+  template:
+    metadata:
+      labels:
+        app: churn-api
+    spec:
+      containers:
+        - name: churn-api
+          image: acrmlopsmtl001.azurecr.io/churn-api:66
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+          env:
+            - name: MODEL_URI
+              value: "models:/churn_demo_model/1"
+            - name: MLFLOW_REGISTRY_URI
+              value: "databricks"
+            - name: DATABRICKS_HOST
+              value: "https://adb-7405615399332589.9.azuredatabricks.net"
+            - name: DATABRICKS_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: databricks-secret
+                  key: token
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: churn-api-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: churn-api
+  ports:
+    - port: 80
+      targetPort: 8000

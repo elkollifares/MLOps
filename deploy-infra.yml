@@ -1,0 +1,55 @@
+
+
+pool:
+  name: 'self-hosted-pool'
+
+variables:
+  TF_WORKING_DIR: 'terraform'
+
+stages:
+- stage: TerraformPlan
+  displayName: Terraform Plan
+  jobs:
+  - job: Plan
+    displayName: Run Terraform Plan
+    steps:
+    - checkout: self
+
+    - task: AzureCLI@2
+      displayName: Terraform Init Validate Plan
+      inputs:
+        azureSubscription: 'sc-azure-mlops-dev'
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        workingDirectory: '$(TF_WORKING_DIR)'
+        inlineScript: |
+          set -e
+          terraform version
+          az account show
+          terraform init
+          terraform validate
+          terraform plan -out=tfplan
+
+- stage: TerraformApply
+  displayName: Terraform Apply
+  dependsOn: TerraformPlan
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+  jobs:
+  - job: Apply
+    displayName: Run Terraform Apply
+    steps:
+    - checkout: self
+
+    - task: AzureCLI@2
+      displayName: Terraform Init Apply
+      inputs:
+        azureSubscription: 'sc-azure-mlops-dev'
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        workingDirectory: '$(TF_WORKING_DIR)'
+        inlineScript: |
+          set -e
+          terraform version
+          az account show
+          terraform init
+          terraform apply -auto-approve

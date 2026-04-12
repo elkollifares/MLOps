@@ -1,0 +1,7 @@
+location             = "East US"
+resource_group_name  = "rg-mlops-dev"
+acr_name             = "acrmlopsmtl001"
+aks_name             = "aks-mlops-dev"
+storage_account_name = "stmlopsartifacts001"
+key_vault_name = "kv-mlops-dev-mtl-84721"
+databricks_name      = "dbw-mlops-dev"

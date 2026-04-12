@@ -1,0 +1,44 @@
+trigger: none
+
+pool:
+  name: 'self-hosted-pool'
+
+variables:
+  imageRepository: 'churn-api'
+  acrLoginServer: 'acrmlopsmtl001.azurecr.io'
+
+stages:
+- stage: DeployToAKS
+  displayName: Deploy to AKS
+  jobs:
+  - deployment: Deploy
+    displayName: Deploy churn-api
+    environment: 'aks-mlops-dev'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - checkout: self
+
+          - script: |
+              IMAGE=$(grep 'image:' API/aks/deployment.yaml | awk '{print $2}')
+              TAG=$(echo "$IMAGE" | awk -F: '{print $NF}')
+              echo "Found image: $IMAGE"
+              echo "Found tag: $TAG"
+              echo "##vso[task.setvariable variable=tag]$TAG"
+            displayName: Extract tag from deployment.yaml
+
+          - task: KubernetesManifest@1
+            displayName: Deploy to AKS
+            inputs:
+              action: deploy
+              connectionType: 'azureResourceManager'
+              azureSubscriptionConnection: 'sc-azure-mlops-dev'
+              azureResourceGroup: 'rg-mlops-dev'
+              kubernetesServiceConnection: 'sc-kubernetes-clus'
+              kubernetesCluster: 'aks-mlops-dev'
+              namespace: default
+              manifests: |
+                API/aks/deployment.yaml
+              containers: |
+                $(acrLoginServer)/$(imageRepository):$(tag)

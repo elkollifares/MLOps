@@ -116,7 +116,6 @@ kubectl describe deployment churn-api
 - Add monitoring (Prometheus/Grafana)
 
 
-
 ## Infrastructure Deployment with Terraform
 
 The cloud infrastructure for this project can be provisioned with Terraform. This includes the resource group, Azure Container Registry (ACR), Azure Kubernetes Service (AKS), networking, and any supporting Azure resources required for deployment.

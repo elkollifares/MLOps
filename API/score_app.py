@@ -7,6 +7,7 @@ from pydantic import BaseModel
 
 MODEL_URI = os.getenv("MODEL_URI", "models:/churn_demo_model/1")
 
+
 mlflow_tracking_uri = os.getenv("MLFLOW_TRACKING_URI")
 if mlflow_tracking_uri:
     mlflow.set_tracking_uri(mlflow_tracking_uri)

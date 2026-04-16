@@ -5,6 +5,7 @@ pool:
 
 variables:
   TF_WORKING_DIR: 'terraform'
+  
 
 stages:
 - stage: TerraformPlan

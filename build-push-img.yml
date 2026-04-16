@@ -10,6 +10,7 @@ variables:
   tag: '$(Build.BuildId)'
   acrLoginServer: 'acrmlopsmtl001.azurecr.io'
   buildxBin: '/Applications/Docker.app/Contents/Resources/cli-plugins/docker-buildx'
+  
 
 stages:
 - stage: BuildAndPush

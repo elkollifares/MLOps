@@ -6,6 +6,7 @@ pool:
 variables:
   imageRepository: 'churn-api'
   acrLoginServer: 'acrmlopsmtl001.azurecr.io'
+  
 
 stages:
 - stage: DeployToAKS

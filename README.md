@@ -110,6 +110,7 @@ kubectl describe deployment churn-api
 
 ## Improvements
 
+
 - Add autoscaling (HPA)
 - Use Helm charts
 - Integrate Azure Key Vault

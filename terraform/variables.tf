@@ -13,6 +13,7 @@ variable "acr_name" {
   default = "acrmlopsmtl001"
 }
 
+
 variable "aks_name" {
   type    = string
   default = "aks-mlops-dev-ca"

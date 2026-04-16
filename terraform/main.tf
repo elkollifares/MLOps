@@ -13,6 +13,7 @@ resource "azurerm_container_registry" "acr" {
   admin_enabled       = false
 }
 
+
 resource "azurerm_storage_account" "artifacts" {
   name                     = var.storage_account_name
   resource_group_name      = azurerm_resource_group.main.name
